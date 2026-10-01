@@ -1,0 +1,6 @@
+{
+  "name": "Voice AI Platform",
+  "description": "How the voice runtime, telephony, retrieval and the distributed pieces actually work",
+  "order": 2,
+  "context": "The learner is a backend engineer at {{env:ORG_NAME|a company}} that runs a production voice-AI platform: bots that take and make real phone calls for banks and lenders, largely in India. The stack includes orchestrator-service (the voice runtime, built on Pipecat), LiveKit and SIP trunks for telephony, EKS in ap-south-1, Postgres, Redis, Celery, SQS, Kinesis and S3, with Grafana, Loki and Prometheus for observability. They are strong at application code and are filling in the systems, telephony, ML and system-design layers underneath it. Lessons should use this platform as the worked example wherever the topic allows, and refer to the company only through the placeholder above."
+}

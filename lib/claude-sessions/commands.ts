@@ -18,7 +18,9 @@ export type SessionCommand = {
 };
 
 export function shellQuote(value: string): string {
-  return /^[A-Za-z0-9._\-/]+$/.test(value) ? value : `'${value.replace(/'/g, `'\\''`)}'`;
+  return /^[A-Za-z0-9._\-/]+$/.test(value)
+    ? value
+    : `'${value.replace(/'/g, `'\\''`)}'`;
 }
 
 function inDir(projectPath: string, rest: string): string {
@@ -30,7 +32,10 @@ export function resumeCommand(summary: SessionSummary): string {
 }
 
 export function forkCommand(summary: SessionSummary): string {
-  return inDir(summary.projectPath, `claude --resume ${summary.id} --fork-session`);
+  return inDir(
+    summary.projectPath,
+    `claude --resume ${summary.id} --fork-session`,
+  );
 }
 
 /** Every command offered for a session, in the order they're shown. */
@@ -42,7 +47,8 @@ export function sessionCommands(summary: SessionSummary): SessionCommand[] {
     {
       key: "resume",
       label: "Resume",
-      description: "Pick up exactly where you left off. Continues this same session.",
+      description:
+        "Pick up exactly where you left off. Continues this same session.",
       command: resumeCommand(summary),
     },
     {
@@ -63,13 +69,15 @@ export function sessionCommands(summary: SessionSummary): SessionCommand[] {
     {
       key: "background",
       label: "Resume in background",
-      description: "Runs detached as a background agent. Manage it later with `claude agents`.",
+      description:
+        "Runs detached as a background agent. Manage it later with `claude agents`.",
       command: inDir(dir, `claude --resume ${id} --bg`),
     },
     {
       key: "model",
       label: "Resume with overrides",
-      description: "Same session, different model or effort level for the rest of it.",
+      description:
+        "Same session, different model or effort level for the rest of it.",
       command: inDir(dir, `claude --resume ${id} --model opus --effort high`),
       needsEdit: true,
     },
@@ -78,7 +86,10 @@ export function sessionCommands(summary: SessionSummary): SessionCommand[] {
       label: "Fork and ask",
       description:
         "Fork into a fresh session and open it with a starting prompt already typed.",
-      command: inDir(dir, `claude --resume ${id} --fork-session "pick up where we left off"`),
+      command: inDir(
+        dir,
+        `claude --resume ${id} --fork-session "pick up where we left off"`,
+      ),
       needsEdit: true,
     },
     {
@@ -90,7 +101,8 @@ export function sessionCommands(summary: SessionSummary): SessionCommand[] {
     {
       key: "transcript",
       label: "Transcript path",
-      description: "The raw JSONL on disk. Read-only — don't edit it while a session is live.",
+      description:
+        "The raw JSONL on disk. Read-only — don't edit it while a session is live.",
       command: summary.transcriptPath,
     },
     {

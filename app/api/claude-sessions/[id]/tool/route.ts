@@ -1,11 +1,17 @@
 import type { NextRequest } from "next/server";
 
 import { getToolCallBody } from "@/lib/claude-sessions";
+import { hiddenInPublicMode } from "@/lib/mode";
 
 export const dynamic = "force-dynamic";
 
 /** GET ?call=toolu_xxx — the input and result for one tool call, fetched on expand. */
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const hidden = await hiddenInPublicMode();
+  if (hidden) return hidden;
   const { id } = await params;
   const callId = request.nextUrl.searchParams.get("call");
   if (!callId) {

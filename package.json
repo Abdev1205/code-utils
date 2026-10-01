@@ -6,7 +6,12 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "audit:ui": "node scripts/audit-ui.mjs",
+    "check": "tsc --noEmit && eslint . && node scripts/audit-ui.mjs && node scripts/check-audit-citations.mjs && node scripts/check-public.mjs",
+    "lessons": "node scripts/write-lessons.mjs",
+    "check:audit": "node scripts/check-audit-citations.mjs",
+    "check:public": "node scripts/check-public.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

@@ -2,6 +2,7 @@
 
 import {
   FileSearch,
+  MessagesSquare,
   Loader2,
   Search,
   SlidersHorizontal,
@@ -10,6 +11,7 @@ import {
 import * as React from "react";
 
 import { SessionCard } from "@/components/claude-sessions/session-card";
+import { SetupHint } from "@/components/setup-hint";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -278,28 +280,58 @@ export function SessionList({ sessions }: { sessions: SessionSummary[] }) {
       )}
 
       {visible.length === 0 ? (
-        <div className="rounded-xl border border-dashed py-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            {sessions.length === 0
-              ? "No sessions found under ~/.claude/projects."
-              : "Nothing matches those filters."}
-          </p>
-          {filtersActive && sessions.length > 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3"
-              onClick={() => {
-                setQuery("");
-                setProject("all");
-                setTime("all");
-                setDeep(null);
-              }}
-            >
-              Reset filters
-            </Button>
-          )}
-        </div>
+        sessions.length === 0 ? (
+          <SetupHint
+            icon={MessagesSquare}
+            title="No Claude Code sessions yet"
+            lead="This tool reads session transcripts Claude Code writes on your own machine. Nothing is uploaded and nothing is sent anywhere."
+            steps={[
+              {
+                text: "Install Claude Code, if you haven't already.",
+                command: "npm install -g @anthropic-ai/claude-code",
+              },
+              {
+                text: "Run it in any project and have a conversation. That writes a transcript.",
+                command: "cd ~/your-project && claude",
+              },
+              {
+                text: "Come back and reload this page. Sessions appear automatically.",
+              },
+              {
+                text: "Transcripts live here. If yours are somewhere else, set CLAUDE_PROJECTS_DIR before starting the dev server.",
+                command: "ls ~/.claude/projects",
+              },
+            ]}
+            footer={
+              <>
+                Read-only: this app never writes to{" "}
+                <code className="font-mono">~/.claude</code>, and never sends a
+                transcript anywhere. Everything stays on this machine.
+              </>
+            }
+          />
+        ) : (
+          <div className="rounded-xl border border-dashed py-16 text-center">
+            <p className="text-sm text-muted-foreground">
+              Nothing matches those filters.
+            </p>
+            {filtersActive && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={() => {
+                  setQuery("");
+                  setProject("all");
+                  setTime("all");
+                  setDeep(null);
+                }}
+              >
+                Reset filters
+              </Button>
+            )}
+          </div>
+        )
       ) : (
         <>
           <div className="mb-2 text-xs text-muted-foreground">

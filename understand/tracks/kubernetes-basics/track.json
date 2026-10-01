@@ -1,0 +1,6 @@
+{
+  "name": "Kubernetes Basics",
+  "description": "A short example track — three modules, to show the format",
+  "order": 1,
+  "context": "The learner is a backend engineer who writes application code daily and is now responsible for the cluster it runs on. They have kubectl access to a cluster but have mostly used it to read logs. Lessons should assume no prior infrastructure knowledge, define every term on first use, and prefer a concrete worked example over abstraction. Where a lesson needs environment-specific detail, write it with placeholders like {{env:KUBE_CLUSTER_NAME}} so the same lesson works for any reader."
+}

@@ -45,7 +45,10 @@ const PROMPT_PREVIEW_MAX = 400;
 export const TRANSCRIPT_PAGE_SIZE = 250;
 
 export function sessionsRoot(): string {
-  return process.env.CLAUDE_PROJECTS_DIR ?? path.join(os.homedir(), ".claude", "projects");
+  return (
+    process.env.CLAUDE_PROJECTS_DIR ??
+    path.join(os.homedir(), ".claude", "projects")
+  );
 }
 
 type SessionFile = {
@@ -201,7 +204,10 @@ async function buildSummary(file: SessionFile): Promise<SessionSummary> {
         break;
       }
       case "system": {
-        if (entry.subtype === "turn_duration" && typeof entry.durationMs === "number") {
+        if (
+          entry.subtype === "turn_duration" &&
+          typeof entry.durationMs === "number"
+        ) {
           summary.activeMs += entry.durationMs;
         }
         break;
@@ -211,9 +217,11 @@ async function buildSummary(file: SessionFile): Promise<SessionSummary> {
         summary.userMsgCount++;
         const text = stripNoise(contentToText(entry.message?.content));
         const images = countImages(entry.message?.content);
-        const display = text || (images ? `[${images} image${images > 1 ? "s" : ""}]` : "");
+        const display =
+          text || (images ? `[${images} image${images > 1 ? "s" : ""}]` : "");
         if (!display) break;
-        if (!summary.firstPrompt) summary.firstPrompt = display.slice(0, PROMPT_PREVIEW_MAX);
+        if (!summary.firstPrompt)
+          summary.firstPrompt = display.slice(0, PROMPT_PREVIEW_MAX);
         summary.lastPrompt = display.slice(0, PROMPT_PREVIEW_MAX);
         if (searchLength < SEARCH_TEXT_MAX) {
           const chunk = display.slice(0, 600);
@@ -231,7 +239,8 @@ async function buildSummary(file: SessionFile): Promise<SessionSummary> {
         pushUnique(summary.efforts, entry.effort);
         const usage = entry.message?.usage;
         if (usage) {
-          if (typeof usage.output_tokens === "number") summary.outputTokens += usage.output_tokens;
+          if (typeof usage.output_tokens === "number")
+            summary.outputTokens += usage.output_tokens;
           if (typeof usage.cache_read_input_tokens === "number") {
             summary.cacheReadTokens += usage.cache_read_input_tokens;
           }
@@ -241,9 +250,11 @@ async function buildSummary(file: SessionFile): Promise<SessionSummary> {
           for (const block of content) {
             if (block?.type === "tool_use") {
               summary.toolCallCount++;
-              const name = typeof block.name === "string" ? block.name : "unknown";
+              const name =
+                typeof block.name === "string" ? block.name : "unknown";
               summary.toolCounts[name] = (summary.toolCounts[name] ?? 0) + 1;
-              if (name === "Skill") pushUnique(summary.skills, block.input?.skill);
+              if (name === "Skill")
+                pushUnique(summary.skills, block.input?.skill);
             }
           }
         }
@@ -255,8 +266,10 @@ async function buildSummary(file: SessionFile): Promise<SessionSummary> {
   if (lastPromptFromEntries) {
     summary.lastPrompt = lastPromptFromEntries.slice(0, PROMPT_PREVIEW_MAX);
   }
-  if (!summary.projectPath) summary.projectPath = decodeProjectKey(file.projectKey);
-  summary.projectLabel = path.basename(summary.projectPath) || summary.projectPath;
+  if (!summary.projectPath)
+    summary.projectPath = decodeProjectKey(file.projectKey);
+  summary.projectLabel =
+    path.basename(summary.projectPath) || summary.projectPath;
   if (!summary.title) {
     summary.title = summary.firstPrompt
       ? summary.firstPrompt.split("\n")[0].slice(0, 90)
@@ -272,7 +285,10 @@ async function buildSummary(file: SessionFile): Promise<SessionSummary> {
  * Keyed by file path; the value records mtime+size so an unchanged session is
  * never re-read. Only files you actually touched cost anything on reload.
  */
-const summaryCache = new Map<string, { stamp: string; summary: SessionSummary }>();
+const summaryCache = new Map<
+  string,
+  { stamp: string; summary: SessionSummary }
+>();
 
 export async function indexSessions(): Promise<SessionSummary[]> {
   const files = await listSessionFiles();
@@ -294,7 +310,9 @@ export async function indexSessions(): Promise<SessionSummary[]> {
     if (!seen.has(key)) summaryCache.delete(key);
   }
 
-  return summaries.sort((a, b) => order(b.lastActivityAt) - order(a.lastActivityAt));
+  return summaries.sort(
+    (a, b) => order(b.lastActivityAt) - order(a.lastActivityAt),
+  );
 }
 
 function order(iso: string | null): number {
@@ -309,7 +327,9 @@ async function findSessionFile(id: string): Promise<SessionFile | null> {
   return files.find((f) => f.id === id) ?? null;
 }
 
-export async function getSessionSummary(id: string): Promise<SessionSummary | null> {
+export async function getSessionSummary(
+  id: string,
+): Promise<SessionSummary | null> {
   const file = await findSessionFile(id);
   if (!file) return null;
   const stamp = `${file.mtimeMs}:${file.sizeBytes}`;
@@ -363,7 +383,9 @@ export async function getSessionDetail(
 
     if (raw.type === "user" && isHumanPrompt(raw)) {
       const full = stripNoise(contentToText(content));
-      const [text, textTruncated] = options.all ? [full, false] : clip(full, MESSAGE_TEXT_MAX);
+      const [text, textTruncated] = options.all
+        ? [full, false]
+        : clip(full, MESSAGE_TEXT_MAX);
       const imageCount = countImages(content);
       if (full || imageCount) {
         entry = {
@@ -390,7 +412,9 @@ export async function getSessionDetail(
       }
     } else if (raw.type === "assistant") {
       const full = stripNoise(contentToText(content));
-      const [text, textTruncated] = options.all ? [full, false] : clip(full, MESSAGE_TEXT_MAX);
+      const [text, textTruncated] = options.all
+        ? [full, false]
+        : clip(full, MESSAGE_TEXT_MAX);
       const thinking = options.all
         ? contentThinking(content)
         : clip(contentThinking(content), THINKING_MAX)[0];
@@ -461,7 +485,9 @@ export async function getSessionDetail(
     prompts,
     totalEntries,
     page,
-    pageCount: options.all ? 1 : Math.max(1, Math.ceil(totalEntries / TRANSCRIPT_PAGE_SIZE)),
+    pageCount: options.all
+      ? 1
+      : Math.max(1, Math.ceil(totalEntries / TRANSCRIPT_PAGE_SIZE)),
     pageSize: options.all ? totalEntries : TRANSCRIPT_PAGE_SIZE,
   };
 }
@@ -491,7 +517,11 @@ export async function getToolCallBody(
           name: typeof block.name === "string" ? block.name : "unknown",
           isError: false,
         };
-      } else if (found && block?.type === "tool_result" && block.tool_use_id === callId) {
+      } else if (
+        found &&
+        block?.type === "tool_result" &&
+        block.tool_use_id === callId
+      ) {
         applyToolResult(found, block);
         found.isError = Boolean(block.is_error);
         return found;
@@ -539,8 +569,9 @@ export async function deepSearch(
   );
 
   return results
-    .filter((r): r is { id: string; hits: number; snippet: string } => r !== null)
+    .filter(
+      (r): r is { id: string; hits: number; snippet: string } => r !== null,
+    )
     .sort((a, b) => b.hits - a.hits)
     .slice(0, limit);
 }
-

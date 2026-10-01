@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { getSessionDetail } from "@/lib/claude-sessions";
+import { hiddenInPublicMode } from "@/lib/mode";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,8 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const hidden = await hiddenInPublicMode();
+  if (hidden) return hidden;
   const { id } = await params;
   const params_ = request.nextUrl.searchParams;
   const page = Number.parseInt(params_.get("page") ?? "1", 10);

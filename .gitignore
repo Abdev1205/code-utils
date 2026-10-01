@@ -26,12 +26,14 @@
 
 # debug
 npm-debug.log*
+*.log
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -39,3 +41,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# study content — personal or company material, never publish from here
+# The one privacy rule: anything under a private/ folder never leaves this machine.
+**/private/
+# Your archive state and env values are personal; the example env is the contract.
+/understand/.understand.json

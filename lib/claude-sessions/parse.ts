@@ -31,7 +31,9 @@ export function contentToText(content: unknown): string {
 export function contentThinking(content: unknown): string {
   if (!Array.isArray(content)) return "";
   return content
-    .filter((b: any) => b && b.type === "thinking" && typeof b.thinking === "string")
+    .filter(
+      (b: any) => b && b.type === "thinking" && typeof b.thinking === "string",
+    )
     .map((b: any) => b.thinking)
     .join("\n\n");
 }
@@ -99,7 +101,9 @@ export function summarizeToolInput(name: string, input: any): string {
   const firstString = Object.values(input).find(
     (v) => typeof v === "string" && v.trim(),
   );
-  return typeof firstString === "string" ? firstString.replace(/\s+/g, " ") : "";
+  return typeof firstString === "string"
+    ? firstString.replace(/\s+/g, " ")
+    : "";
 }
 
 /** tool_result content is sometimes a string, sometimes blocks. */

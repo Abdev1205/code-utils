@@ -17,15 +17,26 @@ export function sessionToMarkdown(detail: SessionDetail): string {
   out.push(`| | |`, `|---|---|`);
   out.push(`| Session ID | \`${summary.id}\` |`);
   out.push(`| Project | \`${summary.projectPath}\` |`);
-  if (summary.lastCwd) out.push(`| Last working dir | \`${summary.lastCwd}\` |`);
+  if (summary.lastCwd)
+    out.push(`| Last working dir | \`${summary.lastCwd}\` |`);
   if (summary.gitBranch) out.push(`| Git branch | \`${summary.gitBranch}\` |`);
   out.push(`| Started | ${stamp(summary.startedAt)} |`);
   out.push(`| Last activity | ${stamp(summary.lastActivityAt)} |`);
-  out.push(`| Messages | ${summary.userMsgCount} prompts, ${summary.assistantMsgCount} replies |`);
+  out.push(
+    `| Messages | ${summary.userMsgCount} prompts, ${summary.assistantMsgCount} replies |`,
+  );
   out.push(`| Tool calls | ${summary.toolCallCount} |`);
-  if (summary.models.length) out.push(`| Models | ${summary.models.join(", ")} |`);
+  if (summary.models.length)
+    out.push(`| Models | ${summary.models.join(", ")} |`);
   out.push("");
-  out.push("Resume this session:", "", "```bash", resumeCommand(summary), "```", "");
+  out.push(
+    "Resume this session:",
+    "",
+    "```bash",
+    resumeCommand(summary),
+    "```",
+    "",
+  );
 
   out.push("---", "");
 
@@ -35,17 +46,22 @@ export function sessionToMarkdown(detail: SessionDetail): string {
       continue;
     }
 
-    const who = entry.role === "user" ? "You" : entry.isSidechain ? "Subagent" : "Claude";
+    const who =
+      entry.role === "user" ? "You" : entry.isSidechain ? "Subagent" : "Claude";
     const when = stamp(entry.timestamp);
     out.push(`## ${who}${when ? ` — ${when}` : ""}`, "");
 
-    if (entry.imageCount) out.push(`_[${entry.imageCount} image(s) attached]_`, "");
+    if (entry.imageCount)
+      out.push(`_[${entry.imageCount} image(s) attached]_`, "");
     if (entry.text) out.push(entry.text, "");
 
     for (const call of entry.toolCalls) {
       const gist = call.inputSummary ? ` — ${call.inputSummary}` : "";
       out.push(`<details>`);
-      out.push(`<summary>🔧 ${call.name}${gist}${call.isError ? " (error)" : ""}</summary>`, "");
+      out.push(
+        `<summary>🔧 ${call.name}${gist}${call.isError ? " (error)" : ""}</summary>`,
+        "",
+      );
       // Exports are built with `all: true`, so every body is present.
       if (call.body) {
         out.push(
@@ -57,7 +73,8 @@ export function sessionToMarkdown(detail: SessionDetail): string {
         if (call.body.result) {
           out.push(
             "```",
-            call.body.result + (call.body.resultTruncated ? "\n… truncated" : ""),
+            call.body.result +
+              (call.body.resultTruncated ? "\n… truncated" : ""),
             "```",
             "",
           );

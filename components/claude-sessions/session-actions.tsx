@@ -1,6 +1,8 @@
 "use client";
 
-import { Download, Ellipsis, GitFork, Play } from "lucide-react";
+import { BookOpen, Download, Ellipsis, GitFork, Play } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import * as React from "react";
 
 import { CopyButton } from "@/components/copy-button";
@@ -33,6 +35,38 @@ export function SessionActions({
   session: SessionSummary;
   compact?: boolean;
 }) {
+  const router = useRouter();
+  const [saving, setSaving] = React.useState(false);
+
+  /** Exports this transcript into understand/claude/ so it becomes a kept document. */
+  async function saveToUnderstand() {
+    setSaving(true);
+    try {
+      const res = await fetch(
+        `/api/claude-sessions/${session.id}/save-to-understand`,
+        {
+          method: "POST",
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      toast.success("Saved to Understand", {
+        description: data.id,
+        action: {
+          label: "Open",
+          onClick: () =>
+            router.push(`/understand/doc?id=${encodeURIComponent(data.id)}`),
+        },
+      });
+    } catch (cause) {
+      toast.error("Couldn't save", {
+        description: cause instanceof Error ? cause.message : String(cause),
+      });
+    } finally {
+      setSaving(false);
+    }
+  }
+
   const extras = sessionCommands(session).filter(
     (command) => command.key !== "resume" && command.key !== "fork",
   );
@@ -103,6 +137,17 @@ export function SessionActions({
             ))}
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
+          <DropdownMenuItem
+            disabled={saving}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              void saveToUnderstand();
+            }}
+          >
+            <BookOpen />
+            {saving ? "Saving…" : "Save to Understand"}
+          </DropdownMenuItem>
           <DropdownMenuItem
             render={
               <a
