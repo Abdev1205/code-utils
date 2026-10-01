@@ -87,6 +87,8 @@ export async function discoverTracks(): Promise<TrackMeta[]> {
     for (const entry of entries) {
       if (!entry.isDirectory() || entry.name.startsWith(".")) continue;
       const dir = `${tracksDir}/${entry.name}`;
+      // private/claude/ holds saved sessions and is its own collection, not a track.
+      if (dir === CLAUDE_DIR) continue;
       let meta: Partial<TrackMeta> = {};
       try {
         meta = JSON.parse(
