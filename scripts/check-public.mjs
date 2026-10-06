@@ -42,7 +42,10 @@ const HIGH = [
 const HEURISTIC = [
   { name: "AWS account id", re: /\b\d{12}\b/ },
   { name: "AWS resource id", re: /\b(vpc|subnet|sg|eni|igw|nat|ami|vol|snap)-[0-9a-f]{8,17}\b/ },
-  { name: "public IPv4", re: /\b(?!10\.|127\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.)(\d{1,3}\.){3}\d{1,3}\b/ },
+  // Excludes private, loopback, link-local (incl. the cloud metadata address),
+  // CGNAT, multicast, netmasks and the RFC 5737 documentation ranges — all of
+  // which appear in teaching material and identify nobody.
+  { name: "public IPv4", re: /\b(?!10\.|127\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.|169\.254\.|100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.|192\.0\.2\.|198\.51\.100\.|203\.0\.113\.|2(2[4-9]|[3-5]\d)\.|255\.)(\d{1,3}\.){3}\d{1,3}\b/ },
   // `.local` is left out on purpose: Kubernetes' own `svc.cluster.local` suffix
   // and the file `.env.local` are in every repo and reveal nothing.
   { name: "internal hostname", re: /\b[a-z0-9-]+\.(internal|corp|intranet)\b/ },
@@ -67,7 +70,8 @@ function patternsFor(file) {
   return [...HIGH, ...DYNAMIC];
 }
 /** Placeholders and documentation examples are allowed to look like the real thing. */
-const ALLOW = [/\{\{env:[A-Z_][A-Z0-9_]*\}\}/, /\b(111122223333|123456789012|9111400012345?|919876543210)\b/, /\b(1\.2\.3\.4|8\.8\.8\.8|0\.0\.0\.0|255\.255\.255\.255)\b/];
+// A line that names example.com/.org/.net is documentation by convention (RFC 2606).
+const ALLOW = [/\{\{env:[A-Z_][A-Z0-9_]*\}\}/, /\bexample\.(com|org|net)\b/, /\b(111122223333|123456789012|9111400012345?|919876543210)\b/, /\b(1\.2\.3\.4|8\.8\.8\.8|0\.0\.0\.0|255\.255\.255\.255)\b/];
 
 
 function scan(file, text) {

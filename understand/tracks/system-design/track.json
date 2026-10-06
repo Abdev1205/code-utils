@@ -1,0 +1,6 @@
+{
+  "name": "System Design",
+  "description": "From fundamentals to AI systems \u2014 62 chapters, case studies, incident playbook and deep dives",
+  "order": 3,
+  "context": "The learner is a backend engineer at {{env:ORG_NAME|a company}} that runs a production voice-AI platform, strong at application code and building the system-design layer underneath it: scaling, data, communication, reliability, and how ML and LLM systems are designed and operated. Lessons should use concrete worked numbers and a realistic production example, prefer Indian-scale services (UPI, Swiggy, a bank) where an example is needed, and refer to the company only through the placeholder above."
+}
